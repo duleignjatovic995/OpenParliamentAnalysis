@@ -1,5 +1,6 @@
 import requests
 import json
+from collections import defaultdict
 
 
 def get_json(url, page=1):
@@ -106,5 +107,40 @@ def akt_naslov_list():
     return lst
 
 
+def poslanik_govori(poslanik_id):
+    lst = []
+    url = 'http://otvoreniparlament.rs/poslanik/' + str(poslanik_id) + '/govori'
+    data = get_json(url)
+    num_pages = data['govori']['last_page']
+    for i in range(num_pages):
+        page = get_json(url=url, page=i)
+        govori = page['govori']['data']
+        for govor in govori:
+            lst.append(govor['govor'])
+    return lst
+
+
+
+# def poslanik_govor_list():
+#     """
+#     1. poslanik i osoba
+#     2. {poslanik: osoba}
+#     3. {osoba: [govori]}
+#     :return:
+#     """
+#     lst = []
+#     osoba_poslanik_dict = defaultdict(list)
+#
+#     data = get_json('http://otvoreniparlament.rs/poslanik')
+#     for stranka in data:
+#         print(stranka)
+#         lista_poslanika = data[stranka]
+#         for poslanik in lista_poslanika:
+#             osoba_id = poslanik['osoba_id']
+#             poslanik_id = poslanik['id']
+#             osoba_poslanik_dict[osoba_id].append(poslanik_id)
+#     print(len(osoba_poslanik_dict))
+
+
 if __name__ == '__main__':
-    print(akt_naslov_list())
+    print(poslanik_govori(8787))
