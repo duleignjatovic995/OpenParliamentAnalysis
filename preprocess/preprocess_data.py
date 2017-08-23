@@ -9,27 +9,28 @@ The intendet pipeline would be:
 from preprocess.stemmers.Croatian_stemmer import stem_list as CroStemmer
 from nltk.tokenize import word_tokenize
 from preprocess.stop_words import stop_words
-from gensim import corpora
+from gensim import corpora, models
+import os
 
-# test_docs = ['Na sednici Odbora za ustavna pitanja i zakonodavstvo, održanoj 14. jula, utvrđen je Predlog za izbor ',
-#              'Zaštitnika građana.\r\n\r\nNarodna skupština, na predlog Odbora za ustavna pitanja i zakonodavstvo, ',
-#              'bira Zaštitnika građana, a kandidate Odboru predlažu poslaničke grupe Narodne skupštine.',
-#              '\r\n\r\nPredlog da se za Zaštitnika građana izabere kandidat Ekaterina Marinković, podnela je ',
-#              'Poslanička grupa Srpska radikalna stranka; predlog da se za Zaštitnika građana izabere zajednički ',
-#              'kandidat Miloš Janković, podneli su Poslanička grupa Demokratska stranka i Poslanička grupa ',
-#              'Socijaldemokratska stranka - Narodni pokret Srbije; predlog da se za Zaštitnika građana izabere ',
-#              'zajednički kandidat Zoran Pašalić, podnele su poslaničke grupe Srpska napredna stranka, ',
-#              'Pokret socijalista - Narodna seljačka stranka - Ujedinjena seljačka stranka, ',
-#              'Socijalistička partija Srbije, Socijaldemokratska partija Srbije, Jedinstvena Srbija, Partija ',
-#              'ujedinjenih penzionera Srbije i Savez vojvođanskih Mađara - Partija za demokratsko delovanje, i predlog ',
-#              'da se za Zaštitnika građana izabere kandidat Vojin Biljić, podnela je Poslanička grupa ',
-#              'Dosta je bilo.\r\n\r\nNakon obavljenih razgovora sa kandidatima, članovi Odbora su većinom ',
-#              'glasova uputili predlog Narodnoj skupštini da za Zaštitnika građana izabere Zorana Pašalića, ',
-#              'po hitnom postupku. \r\n\r\nSednici je predsedavao predsednik Odbora Đorđe Komlenski, ',
-#              'a prisustvovali su sledeći članovi i zamenici članova Odbora: Vesna Nikolić Vukajlović, ',
-#              'Krsto Janjušević, Zoran Krasić, Bojan Torbica, Saša Radulović, Jelena Žarić Kovačević, ',
-#              'Dejan Šulkić, Aleksandra Majkić, Srbislav Filipović, Vojislav Vujić, Nataša Vučković, ',
-#              'Balint Pastor i Jasmina Obradović.']
+test_docs = ['Na sednici Odbora za ustavna pitanja i zakonodavstvo, održanoj 14. jula, utvrđen je Predlog za izbor ',
+             'Zaštitnika građana.\r\n\r\nNarodna skupština, na predlog Odbora za ustavna pitanja i zakonodavstvo, ',
+             'bira Zaštitnika građana, a kandidate Odboru predlažu poslaničke grupe Narodne skupštine.',
+             '\r\n\r\nPredlog da se za Zaštitnika građana izabere kandidat Ekaterina Marinković, podnela je ',
+             'Poslanička grupa Srpska radikalna stranka; predlog da se za Zaštitnika građana izabere zajednički ',
+             'kandidat Miloš Janković, podneli su Poslanička grupa Demokratska stranka i Poslanička grupa ',
+             'Socijaldemokratska stranka - Narodni pokret Srbije; predlog da se za Zaštitnika građana izabere ',
+             'zajednički kandidat Zoran Pašalić, podnele su poslaničke grupe Srpska napredna stranka, ',
+             'Pokret socijalista - Narodna seljačka stranka - Ujedinjena seljačka stranka, ',
+             'Socijalistička partija Srbije, Socijaldemokratska partija Srbije, Jedinstvena Srbija, Partija ',
+             'ujedinjenih penzionera Srbije i Savez vojvođanskih Mađara - Partija za demokratsko delovanje, i predlog ',
+             'da se za Zaštitnika građana izabere kandidat Vojin Biljić, podnela je Poslanička grupa ',
+             'Dosta je bilo.\r\n\r\nNakon obavljenih razgovora sa kandidatima, članovi Odbora su većinom ',
+             'glasova uputili predlog Narodnoj skupštini da za Zaštitnika građana izabere Zorana Pašalića, ',
+             'po hitnom postupku. \r\n\r\nSednici je predsedavao predsednik Odbora Đorđe Komlenski, ',
+             'a prisustvovali su sledeći članovi i zamenici članova Odbora: Vesna Nikolić Vukajlović, ',
+             'Krsto Janjušević, Zoran Krasić, Bojan Torbica, Saša Radulović, Jelena Žarić Kovačević, ',
+             'Dejan Šulkić, Aleksandra Majkić, Srbislav Filipović, Vojislav Vujić, Nataša Vučković, ',
+             'Balint Pastor i Jasmina Obradović.']
 
 
 def get_stemmed_document_list(text):
@@ -57,24 +58,39 @@ def get_stemmed_list_of_documents(list_of_documents):
     return dictionary
 
 
-def create_dictionary(list_of_tokenized_documents, save=False, print_dict=False):
+def get_ngrams(list_of_tokenized_documents, min_count=20):
+    ngram = models.phrases.Phrases(list_of_tokenized_documents, min_count=min_count)
+    for idx in range(len(list_of_tokenized_documents)):
+        for token in ngram[list_of_tokenized_documents[idx]]:
+            if '_' in token:
+                # Token is a bigram - add to document (list of tokens)
+                list_of_tokenized_documents[idx].append(token)
+    return list_of_tokenized_documents
+
+
+def create_dictionary(list_of_tokenized_documents, min_occur=1, max_occur=1, save='', print_dict=False):
     """
     Method for creating tokenized documents into a id <-> term dictionary
     :param list_of_tokenized_documents: list of stemmed document lists e.g. [['tomat', 'potat'], ['salad', 'sou', 'mea'] ...]
+    :param min_occur: number of minimum word occurrences in documents
+    :param max_occur: maximum percentage for word occurrence in documents
     :param save: if True, saves the document in temp folder
     :param print_dict: prints id <-> terms
     :return: id <-> term dictionary
     """
     dictionary = corpora.Dictionary(list_of_tokenized_documents)
-    if save is True:
+    dictionary.filter_extremes(no_below=min_occur, no_above=max_occur)
+    if save != '':
+        pathname = '../temp/' + save
         try:
-            with open('../temp/dictionary.txt', 'wb') as f:
+            with open(os.path.join(os.path.dirname(__file__), pathname), 'wb') as f:
                 dictionary.save(f)
         except IOError:
             print("Couldn't save dictionary to temp folder :(")
 
     if print_dict is True:
         print(dictionary.token2id)
+
     return dictionary
 
 
@@ -90,9 +106,15 @@ def create_document_term_matrix(dictionary, list_of_tokenized_documents):
     return dt_matrix
 
 
-def preprocess_pipeline(list_of_documents):
-    tokenized_doc_list = get_stemmed_list_of_documents(
-        list_of_documents)  # process list of documents -> doc = list of stemmed words
-    dictionary = create_dictionary(tokenized_doc_list)
+def preprocess_pipeline(list_of_documents, ngram=True, min_occur=1, max_occur=1, save_dict=''):
+    # process list of documents -> doc = list of stemmed words
+    tokenized_doc_list = get_stemmed_list_of_documents(list_of_documents)
+    if ngram is True:
+        tokenized_doc_list = get_ngrams(tokenized_doc_list)
+    dictionary = create_dictionary(tokenized_doc_list, min_occur=min_occur, max_occur=max_occur, save=save_dict)
     bow = create_document_term_matrix(dictionary, tokenized_doc_list)
-    return bow
+    return bow, dictionary
+
+
+if __name__ == '__main__':
+    pass
