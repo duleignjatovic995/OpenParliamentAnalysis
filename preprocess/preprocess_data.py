@@ -12,26 +12,6 @@ from preprocess.stop_words import stop_words
 from gensim import corpora, models
 import os
 
-test_docs = ['Na sednici Odbora za ustavna pitanja i zakonodavstvo, održanoj 14. jula, utvrđen je Predlog za izbor ',
-             'Zaštitnika građana.\r\n\r\nNarodna skupština, na predlog Odbora za ustavna pitanja i zakonodavstvo, ',
-             'bira Zaštitnika građana, a kandidate Odboru predlažu poslaničke grupe Narodne skupštine.',
-             '\r\n\r\nPredlog da se za Zaštitnika građana izabere kandidat Ekaterina Marinković, podnela je ',
-             'Poslanička grupa Srpska radikalna stranka; predlog da se za Zaštitnika građana izabere zajednički ',
-             'kandidat Miloš Janković, podneli su Poslanička grupa Demokratska stranka i Poslanička grupa ',
-             'Socijaldemokratska stranka - Narodni pokret Srbije; predlog da se za Zaštitnika građana izabere ',
-             'zajednički kandidat Zoran Pašalić, podnele su poslaničke grupe Srpska napredna stranka, ',
-             'Pokret socijalista - Narodna seljačka stranka - Ujedinjena seljačka stranka, ',
-             'Socijalistička partija Srbije, Socijaldemokratska partija Srbije, Jedinstvena Srbija, Partija ',
-             'ujedinjenih penzionera Srbije i Savez vojvođanskih Mađara - Partija za demokratsko delovanje, i predlog ',
-             'da se za Zaštitnika građana izabere kandidat Vojin Biljić, podnela je Poslanička grupa ',
-             'Dosta je bilo.\r\n\r\nNakon obavljenih razgovora sa kandidatima, članovi Odbora su većinom ',
-             'glasova uputili predlog Narodnoj skupštini da za Zaštitnika građana izabere Zorana Pašalića, ',
-             'po hitnom postupku. \r\n\r\nSednici je predsedavao predsednik Odbora Đorđe Komlenski, ',
-             'a prisustvovali su sledeći članovi i zamenici članova Odbora: Vesna Nikolić Vukajlović, ',
-             'Krsto Janjušević, Zoran Krasić, Bojan Torbica, Saša Radulović, Jelena Žarić Kovačević, ',
-             'Dejan Šulkić, Aleksandra Majkić, Srbislav Filipović, Vojislav Vujić, Nataša Vučković, ',
-             'Balint Pastor i Jasmina Obradović.']
-
 
 def get_stemmed_document_list(text):
     """
@@ -114,7 +94,3 @@ def preprocess_pipeline(list_of_documents, ngram=True, min_occur=1, max_occur=1,
     dictionary = create_dictionary(tokenized_doc_list, min_occur=min_occur, max_occur=max_occur, save=save_dict)
     bow = create_document_term_matrix(dictionary, tokenized_doc_list)
     return bow, dictionary
-
-
-if __name__ == '__main__':
-    pass
