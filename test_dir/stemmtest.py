@@ -3,7 +3,6 @@ The code below is used to measure how good a stemmer is working for Serbian lang
 
 Main idea is to compute score for each stemmer by slicing stemmed words and comparing two lists.
 """
-import json
 import re
 import urllib.request as urllib
 from collections import defaultdict
@@ -15,8 +14,8 @@ import requests
 from nltk.stem import SnowballStemmer, PorterStemmer, LancasterStemmer
 from stemming import porter2
 
-from preprocess.stemmers import stem as CroStemmer
-from preprocess.stemmers import stem_str as SerbStemmer
+from preprocess.stemmers import Croatian_stemmer as CroStemmer
+from preprocess.stemmers import Serbian_stemmer as SerbStemmer
 
 stemmers = [
     PorterStemmer().stem,  # 0
@@ -184,23 +183,6 @@ def crawl2(pages):
         store_words(soup)
 
 
-def crawl3():
-    headers = {'content-type': 'application/json'}
-    r = requests.get('http://otvoreniparlament.rs/aktuelno', headers=headers)
-    if r.text.strip()[-13:] == '{"error":404}':
-        json_string = r.text.strip()[:-13]
-    data = json.loads(json_string)
-    num_pages = data['vesti']['last_page']
-    for i in range(1, num_pages + 1):
-        r = requests.get('http://otvoreniparlament.rs/aktuelno', headers=headers, params={'page': i})
-        if r.text.strip()[-13:] == '{"error":404}':
-            json_string = r.text.strip()[:-13]
-        data = json.loads(json_string)
-        content = data['vesti']['data']
-        for obj in content:
-            print(obj['naslov'])
-
-
 def test_with_fixed_n(n=5):
     for i, s in enumerate(stemmers):
         print(str(i), '. Stemmer:')
@@ -250,6 +232,5 @@ if __name__ == '__main__':
     # print(reci)
     # print(stemmer_score(lista, checklist))
     # main_test(range_from=5, range_to=10)
-    crawl3()
-
+    pass
     # print(s)

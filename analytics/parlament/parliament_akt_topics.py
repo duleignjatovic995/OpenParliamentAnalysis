@@ -16,7 +16,7 @@ print('get_data time: ', time() - start_t0)
 
 # transform a list of documents to a bag of words model
 start_t1 = time()
-bag_of_words, dictionary = preprocess_pipeline(data, min_occur=5, max_occur=1)  # save_dict='fajl'
+bag_of_words, dictionary = preprocess_pipeline(data, ngram=False, min_occur=5, max_occur=0.5)  # save_dict='fajl'
 print('preprocessing time: ', time() - start_t1)
 
 # create tf-idf model
