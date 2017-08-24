@@ -10,12 +10,11 @@ from time import time
 from urllib.parse import urljoin
 
 import bs4 as bs
-import requests
 from nltk.stem import SnowballStemmer, PorterStemmer, LancasterStemmer
 from stemming import porter2
 
-from preprocess.stemmers import Croatian_stemmer as CroStemmer
-from preprocess.stemmers import Serbian_stemmer as SerbStemmer
+from preprocess.stemmers.Croatian_stemmer import stem_str as CroStemmer
+from preprocess.stemmers.Serbian_stemmer import stem_str as SerbStemmer
 
 stemmers = [
     PorterStemmer().stem,  # 0

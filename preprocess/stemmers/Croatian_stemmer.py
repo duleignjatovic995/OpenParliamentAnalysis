@@ -67,7 +67,15 @@ def stem_str(words):
             result += token
             continue
         result += korjenuj(transformiraj(token)) + ' '
+    result.strip()
     return result
+
+
+def stem_word(word):
+    token = word.lower()
+    result = korjenuj(transformiraj(token))
+    final = result.strip()
+    return final
 
 
 def stem_list(words):

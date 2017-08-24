@@ -1,4 +1,4 @@
-from preprocess.stemmers import Croatian_stemmer as CroStemmer
+from preprocess.stemmers.Croatian_stemmer import stem_word as CroStemmer
 import re
 from collections import defaultdict
 from data import get_data
@@ -22,7 +22,7 @@ def store_words(text, stem_dict):
     for i in range(len(words)):
         word = words[i]
         try:
-            stm_word = CroStemmer.stem_str(word)
+            stm_word = CroStemmer(word)
         except TypeError:
             print(word)
             continue
@@ -43,4 +43,13 @@ def get_stem_dictionary(data):
 
 
 if __name__ == '__main__':
-    print(get_stem_dictionary(get_data.akt_naslov_list()))
+    d = get_stem_dictionary(get_data.akt_naslov_list())
+    print('izmen: ', list(d['izmen']))
+    print('dopun: ', list(d['dopun']))
+    print('visok: ', list(d['visok']))
+    print('postupk: ', list(d['postupk']))
+    print('javn: ', list(d['javn']))
+    print('državn: ', list(d['državn']))
+    print('vlad: ', list(d['vlad']))
+    print('republik: ', list(d['republik']))
+    print('srbij: ', list(d['srbij']))

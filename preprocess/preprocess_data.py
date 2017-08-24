@@ -8,9 +8,10 @@ The intendet pipeline would be:
 
 from preprocess.stemmers.Croatian_stemmer import stem_list as CroStemmer
 from nltk.tokenize import word_tokenize
-from preprocess.stop_words import stop_words
+from preprocess.stop_words import stop_words, waste_words
 from gensim import corpora, models
 import os
+import re
 
 
 def get_stemmed_document_list(text):
@@ -19,13 +20,17 @@ def get_stemmed_document_list(text):
     :param text: raw text
     :return: list of preprocessed tokens
     """
+    # Remove punctuation
+    string = re.sub('[\.,:;\(\)\'“`]', ' ', text)
     # Get list of tokens
-    tokens = word_tokenize(text.lower())
+    tokens = word_tokenize(string.lower())
     # Remove stop words
     stop_tokens = [token for token in tokens if not token in stop_words]
     # Stemming
     stemmed_tokens = CroStemmer(stop_tokens)
-    return stemmed_tokens
+    # Filter useless words
+    filtered_tokens = [token for token in stemmed_tokens if not token in waste_words]
+    return filtered_tokens
 
 
 def get_stemmed_list_of_documents(list_of_documents):
@@ -39,6 +44,12 @@ def get_stemmed_list_of_documents(list_of_documents):
 
 
 def get_ngrams(list_of_tokenized_documents, min_count=20):
+    """
+    Method for finding most occurring bigrams.
+    :param list_of_tokenized_documents: 
+    :param min_count: ignore all words and bigrams with total collected count lower than this.
+    :return: documents with most common bi-grams
+    """
     ngram = models.phrases.Phrases(list_of_tokenized_documents, min_count=min_count)
     for idx in range(len(list_of_tokenized_documents)):
         for token in ngram[list_of_tokenized_documents[idx]]:

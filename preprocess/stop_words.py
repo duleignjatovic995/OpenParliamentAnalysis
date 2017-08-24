@@ -40,3 +40,6 @@ bald_stop_words = ['bas', 'bijase', 'bice', 'bise', 'bjese', 'budes', 'doci', 'd
                    'cemo', 'cete',
                    'ces', 'cu', 'cesto', 'ciji', 'sta', 'sto', 'zele', 'zeleo', 'zeli', 'zelim', 'zelimo', 'zelite',
                    'zelis']
+
+waste_words = ['izmen', 'dopun', 'visok', 'posupk', 'javn', 'drzavn', 'vlad', 'republik', 'srbij', 'potvrđivanj',
+               'sporazum', 'odluk', 'sporazum']
