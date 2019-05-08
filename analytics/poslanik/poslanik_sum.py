@@ -9,7 +9,7 @@ def summarize_poslanik_govor(poslanik_id):
     s = ''
     for d in data[:5]:
         s += d
-    return summarize(s, word_count=200)
+    return summarize(s)
 
 
 if __name__ == '__main__':

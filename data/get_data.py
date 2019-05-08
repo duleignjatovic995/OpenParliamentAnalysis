@@ -3,6 +3,8 @@ import json
 from collections import defaultdict
 
 
+# todo refactor file
+
 def get_json(url, page=1):
     headers = {'content-type': 'application/json'}
     params = {'page': page}
@@ -91,11 +93,19 @@ def _print_partija(obj):
 
 
 """
-    Task specific functions.
+    ***************** Task specific functions *****************
+"""
+
+"""
+    Akt entities functions.
 """
 
 
 def akt_naslov_list():
+    """
+    Returns list of al akt entities titles.
+    :return: list of akt titles. {"key"}
+    """
     lst = []
     data = get_json('http://otvoreniparlament.rs/akt')
     num_pages = data['paginator']['last_page']
@@ -107,7 +117,26 @@ def akt_naslov_list():
     return lst
 
 
+def akt_opis(akt_id):
+    url = 'http://otvoreniparlament.rs/akt/' + str(akt_id)
+    data = get_json(url)['akt']
+    naziv = data['naslov']
+    sazetak = data['sazetak']
+    return naziv, sazetak
+
+
+
+"""
+    Functions for poslanik entities and their speeches.
+"""
+
+
 def poslanik_govori(poslanik_id):
+    """
+    Returns list of speeches for all poslanik entities.
+    :param poslanik_id: id of poslanik entity
+    :return: list of speeches.
+    """
     lst = []
     url = 'http://otvoreniparlament.rs/poslanik/' + str(poslanik_id) + '/govori'
     data = get_json(url)
@@ -120,27 +149,61 @@ def poslanik_govori(poslanik_id):
     return lst
 
 
+def osoba_poslanik_list():
+    """
+    This is method for observing relations between entities
+    "osoba" and "poslanik".
+    :return: dict {"osoba_id": ["poslanik_id"*]}
+    """
+    lst1 = []
+    lst2 = []
+    osoba_poslanik_dict = defaultdict(list)
 
-# def poslanik_govor_list():
-#     """
-#     1. poslanik i osoba
-#     2. {poslanik: osoba}
-#     3. {osoba: [govori]}
-#     :return:
-#     """
-#     lst = []
-#     osoba_poslanik_dict = defaultdict(list)
-#
-#     data = get_json('http://otvoreniparlament.rs/poslanik')
-#     for stranka in data:
-#         print(stranka)
-#         lista_poslanika = data[stranka]
-#         for poslanik in lista_poslanika:
-#             osoba_id = poslanik['osoba_id']
-#             poslanik_id = poslanik['id']
-#             osoba_poslanik_dict[osoba_id].append(poslanik_id)
-#     print(len(osoba_poslanik_dict))
+    data = get_json('http://otvoreniparlament.rs/poslanik')
+    for stranka in data:
+        # print(stranka)
+        lista_poslanika = data[stranka]
+        for poslanik in lista_poslanika:
+            print(poslanik['ime'])
+            osoba_id = poslanik['osoba_id']
+            poslanik_id = poslanik['id']
+            osoba_poslanik_dict[osoba_id].append(poslanik_id)
+            lst1.append(osoba_id)
+            lst2.append(poslanik_id)
+    return osoba_poslanik_dict
+
+
+def poslanik_id_list():
+    """
+    This method returns list of all active poslanik_id's
+    :return: poslanik_id list
+    """
+    lst = []
+    data = get_json('http://otvoreniparlament.rs/poslanik')
+    for stranka in data:
+        lista_poslanika = data[stranka]
+        for poslanik in lista_poslanika:
+            poslanik_id = poslanik['id']
+            lst.append(poslanik_id)
+    return lst
+
+
+# todo: obavezno kesirati
+def poslanik_govori_list():
+    govori_dict = defaultdict(list)
+    govori_list = []
+    lst = poslanik_id_list()
+    for id in lst:
+        govori = poslanik_govori(id)
+        print(govori)
+        # govori_dict[id].append(govori)
+        govori_list.append(govori)
+    return govori_list
 
 
 if __name__ == '__main__':
-    print(poslanik_govori(8787))
+    # print(get_osobe())
+    # print(osoba_poslanik_list())
+    # print(poslanik_id_list())
+    # print(poslanik_govori_list())
+    print(akt_opis(3225))

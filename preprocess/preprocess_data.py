@@ -21,7 +21,7 @@ def get_stemmed_document_list(text):
     :return: list of preprocessed tokens
     """
     # Remove punctuation
-    string = re.sub('[\.,:;\(\)\'“`]', ' ', text)
+    string = re.sub('[\.,:;\(\)\'“`0-9]', ' ', text)
     # Get list of tokens
     tokens = word_tokenize(string.lower())
     # Remove stop words
